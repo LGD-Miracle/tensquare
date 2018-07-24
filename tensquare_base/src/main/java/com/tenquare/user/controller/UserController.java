@@ -2,10 +2,16 @@ package com.tenquare.user.controller;
 
 import com.tenquare.base.pojo.Label;
 import com.tenquare.base.service.LabelService;
+import entity.PageResult;
 import entity.Result;
+import entity.StatusCode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: Shaoyuan Du
@@ -31,7 +37,7 @@ public class UserController {
      */
     @RequestMapping(value = "", method = RequestMethod.GET)
     public Result<Label> findAll() {
-        return new Result(true, 20000,"查询成功!",labelService.findAll());
+        return new Result(true, StatusCode.OK,"查询成功!",labelService.findAll());
     }
 
     /**
@@ -44,7 +50,7 @@ public class UserController {
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public Result<Label> findById(@PathVariable String id) {
-        return new Result(true, 20000, "查询成功", labelService.findLabelById(id));
+        return new Result(true, StatusCode.OK, "查询成功", labelService.findLabelById(id));
     }
 
     /**
@@ -56,23 +62,9 @@ public class UserController {
      *
      */
     @RequestMapping(value = "", method = RequestMethod.PUT)
-    public Result add() {
-        Label label = new Label();
-        System.out.println("进入了......");
-        for (int i = 1; i <= 100; i++) {
-            label.setId(i + "");
-            label.setCount((long)(i+50));
-            label.setFans((long)(i+5000));
-            label.setLabelName("标签" + i);
-            if(i%2 == 0) {
-                label.setRecommend("是");
-            } else {
-                label.setRecommend("否");
-            }
-            label.setState("状态" + i);
+    public Result add(Label label) {
             labelService.add(label);
-        }
-        return new Result(true, 20000, "增加成功!");
+        return new Result(true, StatusCode.OK, "增加成功!");
     }
 
     /**
@@ -87,7 +79,7 @@ public class UserController {
     public Result update(@RequestBody Label label, String id) {
         label.setId(id);
         labelService.update(label);
-        return new Result(true, 20000, "修改成功!");
+        return new Result(true, StatusCode.OK, "修改成功!");
     }
 
     /**
@@ -101,7 +93,37 @@ public class UserController {
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public Result delete(@PathVariable String id) {
         labelService.delete(id);
-        return new Result(true, 20000, "删除成功!");
+        return new Result(true, StatusCode.OK, "删除成功!");
+    }
+    
+    /**
+     *
+     * @Description: 根据条件查询
+     *
+     * @param: [searchMap]
+     * @return: entity.Result<java.util.List>
+     *
+     */
+    @RequestMapping(value = "/search", method = RequestMethod.POST)
+    public Result<List> findSearch(@RequestBody Map searchMap) {
+        return new Result<>(true, StatusCode.OK, "查询成功!",
+                labelService.findSearch(searchMap));
+    }
+
+    /**
+     *
+     * @Description: 条件分页查询
+     *
+     * @param: [searchMap, page, size]
+     * @return: entity.Result<java.util.List>
+     *
+     */
+    @RequestMapping(value = "/search/{page}/{size}",method = RequestMethod.POST)
+    public Result<List> findSearch(@RequestBody Map searchMap
+            , @PathVariable int page, @PathVariable int size) {
+        Page pageList = labelService.findSearch(searchMap, page, size);
+        return new Result<>(true, StatusCode.OK,"查询成功!",
+                new PageResult<>(pageList.getTotalElements(), pageList.getContent()));
     }
 }
 
