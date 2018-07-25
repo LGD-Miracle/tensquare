@@ -1,0 +1,13 @@
+server: 
+  port: 9003
+spring:
+  application:
+    name: tensquare_qa
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://192.168.9.241:3306/global_core_hr?characterEncoding=utf8&autoReconnect=true&useSSL=false
+    data-username: Shaoyuan.Du
+    data-password: 123123
+  jpa:
+    database: mysql
+    show-sql: true
